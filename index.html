@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>アナグラム面接対策</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --card: #1e1e24;
+    --border: #2a2a35;
+    --accent: #ff6b35;
+    --accent2: #ffb347;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #facc15;
+    --blue: #60a5fa;
+    --purple: #c084fc;
+    --text: #f0f0f5;
+    --muted: #8888aa;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent); letter-spacing: 2px; }
+  .header-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 12px; overflow-x: auto; }
+  .tab { padding: 14px 14px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .page { display: none; padding: 16px 16px 80px; }
+  .page.active { display: block; }
+
+  /* PROGRESS */
+  .overall-card { background: linear-gradient(135deg,#1e1e24,#252530); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+  .ring-container { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+  .ring-svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+  .ring-fill { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+  .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'Space Mono',monospace; font-size: 20px; font-weight: 700; color: var(--accent); }
+  .overall-stats { flex: 1; }
+  .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+  .stat-val { font-family: 'Space Mono',monospace; color: var(--accent); font-weight: 700; }
+
+  .section-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; margin-top: 20px; }
+  .unit-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+  .unit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .unit-name { font-size: 13px; font-weight: 700; }
+  .unit-badge { font-family: 'Space Mono',monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .badge-done { background: #1a3a2a; color: var(--green); }
+  .badge-partial { background: #3a2a00; color: var(--yellow); }
+  .badge-todo { background: #2a1a1a; color: var(--red); }
+  .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .fill-green { background: var(--green); }
+  .fill-yellow { background: var(--yellow); }
+  .fill-red { background: var(--red); }
+
+  /* QUIZ */
+  .quiz-controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .mode-btn { flex: 1; min-width: 80px; padding: 10px 8px; font-size: 12px; font-weight: 700; background: var(--card); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; cursor: pointer; transition: all .2s; font-family: 'Noto Sans JP',sans-serif; }
+  .mode-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+  .filter-btn { flex-shrink: 0; padding: 6px 12px; font-size: 11px; font-weight: 700; background: var(--card); border: 1px solid var(--border); color: var(--muted); border-radius: 20px; cursor: pointer; transition: all .2s; font-family: 'Noto Sans JP',sans-serif; }
+  .filter-btn.active { background: var(--surface); color: var(--text); border-color: var(--accent2); }
+
+  .quiz-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
+  .quiz-meta { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .quiz-tag { display: inline-block; font-size: 11px; font-weight: 700; background: #1a1a30; color: var(--accent2); padding: 3px 10px; border-radius: 20px; }
+  .quiz-type-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .type-choice { background: #1a2a1a; color: var(--green); }
+  .type-text { background: #2a1a2a; color: var(--purple); }
+  .type-case { background: #1a2030; color: var(--blue); }
+  .quiz-q { font-size: 15px; font-weight: 700; line-height: 1.7; margin-bottom: 18px; }
+  .quiz-context { background: var(--surface); border-left: 3px solid var(--accent2); border-radius: 6px; padding: 12px 14px; margin-bottom: 16px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+  .choice-btn { text-align: left; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 10px; cursor: pointer; font-size: 13px; font-family: 'Noto Sans JP',sans-serif; transition: all .15s; line-height: 1.5; }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: #1e1e30; }
+  .choice-btn.correct { background: #1a3a2a; border-color: var(--green); color: var(--green); }
+  .choice-btn.wrong { background: #3a1a1a; border-color: var(--red); color: var(--red); }
+  .choice-btn:disabled { cursor: default; }
+
+  .text-input-area { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Noto Sans JP',sans-serif; font-size: 14px; padding: 14px; resize: none; min-height: 110px; margin-bottom: 10px; outline: none; transition: border-color .2s; }
+  .text-input-area:focus { border-color: var(--accent); }
+
+  .feedback-box { border-radius: 10px; padding: 14px; margin-top: 14px; font-size: 13px; line-height: 1.8; display: none; }
+  .feedback-box.show { display: block; }
+  .feedback-correct { background: #1a3a2a; border: 1px solid var(--green); }
+  .feedback-wrong { background: #3a1a1a; border: 1px solid var(--red); }
+  .feedback-label { font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+
+  .action-btn { width: 100%; padding: 14px; font-size: 14px; font-weight: 700; background: var(--accent); color: white; border: none; border-radius: 10px; cursor: pointer; transition: opacity .2s; font-family: 'Noto Sans JP',sans-serif; margin-top: 8px; }
+  .action-btn:hover { opacity: .9; }
+  .action-btn.secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .action-btn.green { background: var(--green); color: #0d1a0d; }
+  .action-btn.red-btn { background: var(--red); color: #1a0d0d; }
+
+  .mark-row { display: flex; gap: 8px; margin-top: 10px; }
+  .mark-row .action-btn { margin-top: 0; }
+
+  /* WEAK */
+  .weak-summary { background: linear-gradient(135deg,#2a1a1a,#3a2020); border: 1px solid #4a2020; border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+  .weak-icon { font-size: 32px; }
+  .weak-title { font-size: 15px; font-weight: 700; }
+  .weak-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .weak-item { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--red); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+  .weak-item-tag { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .weak-item-q { font-size: 13px; font-weight: 700; line-height: 1.6; margin-bottom: 8px; }
+  .retry-btn { display: inline-block; margin-top: 8px; padding: 5px 14px; font-size: 12px; font-weight: 700; background: #2a1a1a; color: var(--accent); border: 1px solid var(--accent); border-radius: 20px; cursor: pointer; transition: all .2s; }
+  .retry-btn:hover { background: var(--accent); color: white; }
+
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
+  .empty-icon { font-size: 44px; margin-bottom: 12px; }
+
+  .date-section { margin-bottom: 20px; }
+  .date-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 2px; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+  .log-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e1e24; }
+  .log-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .log-text { font-size: 12px; flex: 1; color: var(--muted); }
+  .log-result { font-family: 'Space Mono',monospace; font-size: 12px; }
+  .result-ok { color: var(--green); }
+  .result-ng { color: var(--red); }
+
+  .points-list { margin-top: 10px; }
+  .point-item { display: inline-block; background: #2a2a3a; padding: 2px 8px; border-radius: 20px; margin: 2px; font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">ANAGRAM STUDY</div>
+    <div class="header-sub">運用型広告 面接対策</div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;" id="today-date"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('progress')">📊 進捗</div>
+  <div class="tab" onclick="switchTab('quiz')">🎯 クイズ</div>
+  <div class="tab" onclick="switchTab('weak')">⚠️ 弱点</div>
+</div>
+
+<div class="page active" id="page-progress">
+  <div class="overall-card">
+    <div class="ring-container">
+      <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="251"/>
+      </svg>
+      <div class="ring-text" id="ring-pct">0%</div>
+    </div>
+    <div class="overall-stats">
+      <div class="stat-row"><span>総問題数</span><span class="stat-val" id="stat-total">-</span></div>
+      <div class="stat-row"><span>正解済み</span><span class="stat-val" id="stat-correct">-</span></div>
+      <div class="stat-row"><span>回答済み</span><span class="stat-val" id="stat-answered">-</span></div>
+      <div class="stat-row"><span>未挑戦</span><span class="stat-val" id="stat-unanswered">-</span></div>
+    </div>
+  </div>
+  <div class="section-title">トピック別進捗</div>
+  <div id="unit-grid"></div>
+  <div class="section-title">日付別ログ</div>
+  <div id="date-log"></div>
+</div>
+
+<div class="page" id="page-quiz">
+  <div class="quiz-controls">
+    <button class="mode-btn active" onclick="setMode('all')" id="btn-all">すべて</button>
+    <button class="mode-btn" onclick="setMode('choice')" id="btn-choice">4択</button>
+    <button class="mode-btn" onclick="setMode('text')" id="btn-text">記述</button>
+    <button class="mode-btn" onclick="setMode('case')" id="btn-case">ケース</button>
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div id="quiz-area"></div>
+</div>
+
+<div class="page" id="page-weak">
+  <div class="weak-summary">
+    <div class="weak-icon">🔍</div>
+    <div>
+      <div class="weak-title">苦手な問題</div>
+      <div class="weak-desc">間違えた問題を集中復習しよう</div>
+    </div>
+  </div>
+  <div id="weak-list"></div>
+</div>
+
+<script>
+// ==================== UNITS ====================
+const UNITS = [
+  { id:'u1', name:'運用型広告の基礎' },
+  { id:'u2', name:'Google広告の仕組み' },
+  { id:'u3', name:'Meta広告の仕組み' },
+  { id:'u4', name:'キーワード設計' },
+  { id:'u5', name:'指標の読み方（CTR/CVR/CPA）' },
+  { id:'u6', name:'提案書・SDS法' },
+  { id:'u7', name:'ロジカルシンキング' },
+  { id:'u8', name:'言語化力・伝え方' },
+  { id:'u9', name:'アナグラムの思考法' },
+];
+
+// ==================== 4択クイズ ====================
+const QUIZ_CHOICE = [
+  // u1 運用型広告の基礎
+  {id:'c01',unit:'u1',tag:'運用型広告の基礎',q:'運用型広告の最大の特徴として最も正しいものはどれですか？',choices:['テレビCMより必ず安価に出稿できる','ターゲティング・金額・効果測定をリアルタイムで調整できる','一度設定したら自動で最適化される','必ずGoogleとMetaの両方に出稿しなければならない'],ans:1,exp:'運用型広告は細かなターゲティング設定・入札金額の変更・数値による効果測定が随時できるのが最大の特徴です。'},
+  {id:'c02',unit:'u1',tag:'運用型広告の基礎',q:'運用型広告と純広告（純粋な掲載枠の買取）の最も大きな違いはどれですか？',choices:['運用型広告は必ず動画形式である','純広告は効果測定ができない','運用型広告は配信後も随時調整・最適化ができる','純広告はインターネット上にしか出稿できない'],ans:2,exp:'純広告は掲載枠を一定期間買い取る形式で、出稿後の変更が難しいです。運用型広告はリアルタイムで入札・ターゲティング・クリエイティブを変更できます。'},
+  {id:'c03',unit:'u1',tag:'運用型広告の基礎',q:'運用型広告において「コンバージョン（CV）」とは何を指しますか？',choices:['広告が表示された回数','広告がクリックされた回数','問い合わせ・購入など広告主が設定した成果のこと','広告の品質スコア'],ans:2,exp:'CVとは広告主がゴールとして設定したアクション（問い合わせ・資料請求・購入など）が達成された回数です。'},
+  {id:'c04',unit:'u1',tag:'運用型広告の基礎',q:'運用型広告のPDCAサイクルとして最も適切な順序はどれですか？',choices:['Plan→Do→Check→Action','Do→Check→Plan→Action','Check→Plan→Do→Action','Action→Plan→Do→Check'],ans:0,exp:'広告運用はPlan（目標設定・戦略立案）→Do（出稿）→Check（数値分析）→Action（改善）のサイクルを繰り返します。'},
+
+  // u2 Google広告
+  {id:'c05',unit:'u2',tag:'Google広告',q:'Google広告の掲載順位を決める「広告ランク」の計算式はどれですか？',choices:['入札金額 + 品質スコア','入札金額 × 品質スコア','入札金額 ÷ 品質スコア','入札金額 - 品質スコア'],ans:1,exp:'広告ランク = 入札金額 × 品質スコア。最高入札額の人が1位になるわけではなく、ユーザーへの関連性（品質スコア）も重要です。'},
+  {id:'c06',unit:'u2',tag:'Google広告',q:'Googleの検索広告において「品質スコア」が高くなると何が起きますか？',choices:['広告費が自動的に増加する','少ない入札金額でも上位に表示されやすくなる','広告の表示回数が強制的に増える','競合の広告が非表示になる'],ans:1,exp:'品質スコアはGoogleがその広告のユーザーへの有用性を評価した点数。高いほど同じ入札金額でも上位表示されやすく、コストを抑えられます。'},
+  {id:'c07',unit:'u2',tag:'Google広告',q:'Google検索広告の最大の強みはどれですか？',choices:['年齢・性別・興味関心で精密にターゲティングできる','すでに需要がある（能動的に検索している）ユーザーに届けられる','動画コンテンツで感情的に訴求できる','リーチ数が全広告形式の中で最大'],ans:1,exp:'検索広告は「今まさに探している人」に届けられるのが最大の強み。需要が顕在化しているユーザーにアプローチできます。'},
+  {id:'c08',unit:'u2',tag:'Google広告',q:'Google広告のディスプレイ広告と検索広告の最大の違いはどれですか？',choices:['ディスプレイ広告はGoogleのサービスにしか表示されない','検索広告はテキストのみ、ディスプレイ広告は画像・動画も使える','ディスプレイ広告は無料で出稿できる','検索広告はBtoB向け、ディスプレイ広告はBtoC向け'],ans:1,exp:'検索広告は主にテキスト形式で検索結果に表示。ディスプレイ広告はWebサイトやアプリのバナー枠に画像・動画形式で表示されます。'},
+  {id:'c09',unit:'u2',tag:'Google広告',q:'リスティング広告（検索連動型広告）の入札方式として正しいものはどれですか？',choices:['固定料金制（月額払い）','オークション形式（クリックごとに競争）','先着順（早く申し込んだ順に表示）','抽選制（ランダムに表示枠が決まる）'],ans:1,exp:'リスティング広告はオークション形式。検索が行われるたびにリアルタイムでオークションが実施され、広告ランクの高い順に表示されます。'},
+
+  // u3 Meta広告
+  {id:'c10',unit:'u3',tag:'Meta広告',q:'Meta広告（Facebook/Instagram）が最も得意とするターゲティング軸はどれですか？',choices:['検索キーワード（何を探しているか）','人物属性・興味関心（どんな人か）','購入履歴（何を買ったか）','閲覧したWebサイト（どこを見たか）'],ans:1,exp:'Metaは膨大なユーザーデータを持ち、年齢・性別・趣味・ライフイベントなど「その人がどんな人か」でターゲティングするのが最大の強みです。'},
+  {id:'c11',unit:'u3',tag:'Meta広告',q:'Meta広告が「新商品・新サービスの認知拡大」に向いている理由はどれですか？',choices:['Metaは検索エンジンとも連携しているから','ユーザーが受動的にタイムラインを眺めている状態に表示されるから','Meta広告は他媒体より圧倒的に安価だから','Meta広告はクリック率が必ず高いから'],ans:1,exp:'Meta広告はユーザーが能動的に何かを探しているわけではない状態に表示されます。だからこそ、まだ知られていない商品を「知ってもらう」認知目的に適しています。'},
+  {id:'c12',unit:'u3',tag:'Meta広告',q:'近年のMeta広告運用の変化として最も正しいものはどれですか？',choices:['手動での細かいターゲット設定が以前より重要になった','機械学習に任せてゴールを設定する運用が主流になった','Instagram広告はFacebook広告と完全に別管理になった','Meta広告のクリエイティブ（画像・動画）の重要性が下がった'],ans:1,exp:'近年のMeta広告は「こういう成果が欲しい」とゴールだけ設定して機械学習に配信を任せる運用が成果が出やすくなっています。運用者は「設定する人」から「データを見て判断する人」に変わってきています。'},
+  {id:'c13',unit:'u3',tag:'Meta広告',q:'Google広告とMeta広告、「既に需要がある商品・サービス」に向いているのはどちらですか？',choices:['Meta広告（Facebook/Instagram）','Google広告（検索広告）','どちらも同じ','商材の価格による'],ans:1,exp:'Google検索広告は「〇〇 費用」「〇〇 比較」など、すでに商品を知っていて検討段階のユーザーに届けられます。需要が顕在化している商材に最適です。'},
+
+  // u4 キーワード設計
+  {id:'c14',unit:'u4',tag:'キーワード設計',q:'「コンタクトセンター 費用 安い」というキーワードの購買フェーズはどれですか？',choices:['情報収集中（まだ検討初期）','比較・検討中（今すぐ見積もり段階）','認知段階（サービスの存在を知ったばかり）','離脱後（一度検討をやめた）'],ans:1,exp:'「費用 安い」という具体的なキーワードは、既に導入を検討しており、コスト面で比較・見積もりをしている今すぐ検討フェーズのユーザーを示します。'},
+  {id:'c15',unit:'u4',tag:'キーワード設計',q:'「コンタクトセンター とは」というキーワードを検索した人の購買フェーズはどれですか？',choices:['今すぐ導入を決めている','情報収集中（まだ検討初期）','競合比較中','導入後の改善を探している'],ans:1,exp:'「とは」という言葉は意味・概念を調べている段階。まだ購入を検討しているわけではなく、情報収集の初期段階のユーザーです。この層に費用訴求の広告を出しても成果にはつながりにくい。'},
+  {id:'c16',unit:'u4',tag:'キーワード設計',q:'予算が限られている場合、どの購買フェーズのキーワードに優先的に予算を集中すべきですか？',choices:['認知段階（とは、仕組み系）','情報収集段階（メリット、デメリット系）','今すぐ検討段階（費用、比較、おすすめ系）','どのフェーズも均等に分配すべき'],ans:2,exp:'予算が限られる場合は、購買意欲が最も高い「今すぐ検討」フェーズのキーワードに集中するのが鉄則。CVにつながりやすいため費用対効果が高くなります。'},
+  {id:'c17',unit:'u4',tag:'キーワード設計',q:'コンサルタントがキーワード選定時に「検索意図」まで考える最大の理由はどれですか？',choices:['Googleのアルゴリズムを騙すため','キーワードに合った広告文・LPを提供しCVにつなげるため','できるだけ多くのキーワードに入札するため','競合のキーワードを盗むため'],ans:1,exp:'キーワードと広告文・LPの内容が一致しないと、クリックされても離脱されてしまいます。検索意図を理解することで、ユーザーが求めるものを的確に提供できます。'},
+  {id:'c18',unit:'u4',tag:'キーワード設計',q:'「コンタクトセンター おすすめ」で検索した人に最も適切な広告文の方向性はどれですか？',choices:['「コンタクトセンターとは何か」を解説する','「料金が業界最安値」を前面に出す','「選び方のポイント」や「他社との比較」を訴求する','「今すぐ無料トライアル」を訴求する'],ans:2,exp:'「おすすめ」で検索している人は比較・検討段階。どれを選べばいいか迷っているので、選び方の基準や他社比較の情報が刺さります。'},
+
+  // u5 指標
+  {id:'c19',unit:'u5',tag:'指標の読み方',q:'CTR（クリック率）の計算式として正しいものはどれですか？',choices:['広告費 ÷ クリック数 × 100','CV数 ÷ クリック数 × 100','クリック数 ÷ 表示回数 × 100','クリック数 ÷ CV数 × 100'],ans:2,exp:'CTR = クリック数 ÷ 表示回数 × 100。広告を見た人のうち何%がクリックしたかを表します。'},
+  {id:'c20',unit:'u5',tag:'指標の読み方',q:'CVR（コンバージョン率）の計算式として正しいものはどれですか？',choices:['広告費 ÷ CV数','CV数 ÷ クリック数 × 100','クリック数 ÷ 表示回数 × 100','CV数 ÷ 表示回数 × 100'],ans:1,exp:'CVR = CV数 ÷ クリック数 × 100。クリックした人のうち何%が成果（問い合わせ・購入）に至ったかを表します。'},
+  {id:'c21',unit:'u5',tag:'指標の読み方',q:'CPA（顧客獲得単価）の計算式として正しいものはどれですか？',choices:['広告費 ÷ 表示回数','広告費 ÷ クリック数','クリック数 ÷ CV数','広告費 ÷ CV数'],ans:3,exp:'CPA = 広告費 ÷ CV数。1件のコンバージョンを獲得するのにかかった費用です。CPAが低いほど効率よく成果を得られています。'},
+  {id:'c22',unit:'u5',tag:'問題切り分け',q:'CTRは低いがCVRが高い場合、問題はどこにありますか？',choices:['LP（ランディングページ）の設計','広告クリエイティブ（広告文・バナー）','キーワード選定の問題','入札金額が低すぎる'],ans:1,exp:'CVRが高い＝LP・サイトはCVに機能している。CTRが低い＝広告はクリックされていない。問題は広告文やバナーなどのクリエイティブ側にあります。'},
+  {id:'c23',unit:'u5',tag:'問題切り分け',q:'CTRは高いがCVRが低い場合、問題はどこにありますか？',choices:['広告クリエイティブ（広告文・バナー）','LP（ランディングページ）やサイト設計','キーワード選定','品質スコアの低下'],ans:1,exp:'CTRが高い＝広告は興味を持たれてクリックされている。しかしCVRが低い＝クリック後に離脱している。問題はLP・サイト側にあると切り分けられます。'},
+  {id:'c24',unit:'u5',tag:'指標の読み方',q:'広告費100,000円、クリック数500回、CV数10件のとき、CPAはいくらですか？',choices:['200円','5,000円','10,000円','50,000円'],ans:2,exp:'CPA = 100,000円 ÷ 10件 = 10,000円。1件の問い合わせを得るのに1万円かかっている状態です。'},
+  {id:'c25',unit:'u5',tag:'指標の読み方',q:'表示回数10,000回、クリック数200回のとき、CTRはいくつですか？',choices:['0.2%','2%','20%','200%'],ans:1,exp:'CTR = 200 ÷ 10,000 × 100 = 2%。業界平均的な水準です。'},
+  {id:'c26',unit:'u5',tag:'指標の読み方',q:'クリック数100回、CV数5件のとき、CVRはいくつですか？',choices:['0.5%','5%','50%','500%'],ans:1,exp:'CVR = 5 ÷ 100 × 100 = 5%。クリックした100人中5人が問い合わせ等のアクションをとったということです。'},
+  {id:'c27',unit:'u5',tag:'問題切り分け',q:'CPAが先月より悪化したとき、コンサルタントがまず確認すべきことはどれですか？',choices:['競合の広告を調査する','CTRとCVRをそれぞれ確認して問題箇所を切り分ける','すぐに入札金額を上げる','広告を一時停止する'],ans:1,exp:'CPA悪化の原因はCTR低下（広告側の問題）かCVR低下（LP側の問題）のどちらかです。まずこの2つを分けて確認することで、改善すべき箇所をピンポイントで特定できます。'},
+
+  // u6 提案書・SDS
+  {id:'c28',unit:'u6',tag:'SDS法',q:'SDS法で提案書を書くとき、最初に来るべき内容はどれですか？',choices:['詳細なデータと数字','結論・提案内容','問題の背景説明','改善後の予測値'],ans:1,exp:'SDS法はSummary（結論）→Details（根拠）→Summary（結論を繰り返す）の順。ビジネスでは結論を最初に伝えることでクライアントが素早く判断できます。'},
+  {id:'c29',unit:'u6',tag:'SDS法',q:'SDS法の「D（Details）」では何を伝えますか？',choices:['改善策のコスト','結論を支える数字・根拠・分析','次回のミーティング日程','会社のビジョン'],ans:1,exp:'D（Details）は結論の根拠となるデータ・分析・理由を示すパートです。「なぜそう言えるのか」を数字で示すことでクライアントの納得度が上がります。'},
+  {id:'c30',unit:'u6',tag:'提案書',q:'「CTR0.5%、CVR10%」というデータを見たとき、最初にクライアントに伝えるべき内容はどれですか？',choices:['CTRとCVRの計算式の説明','CTRが業界平均（2〜3%）を大きく下回っており、広告文改善を提案する','CVRが高いのでLPは問題なし、とだけ報告する','データの確認に時間が必要なので次回報告する'],ans:1,exp:'SDS法に従い、まず結論（何を改善すべきか）を伝えます。その後に根拠（CTRが低い・CVRは高い＝クリエイティブ問題）を示します。'},
+  {id:'c31',unit:'u6',tag:'提案書',q:'クライアントへの報告で「結論を最初に伝える」最大の理由はどれですか？',choices:['コンサルタントの知識を見せるため','クライアントが判断するための情報を素早く提供するため','提案書を短くするため','数字の説明を省くため'],ans:1,exp:'クライアントは判断を下す立場。「で、結局どうすればいいの？」を最初に知りたいのです。結論を先に伝えることは相手の時間を尊重することでもあります。'},
+
+  // u7 ロジカルシンキング
+  {id:'c32',unit:'u7',tag:'ロジカルシンキング',q:'「なぜCTRが低いのか？」を考えるとき、ロジカルに原因を分解する方法として最も適切なものはどれですか？',choices:['感覚で「たぶん広告文が悪い」と判断する','CTR低下の原因として考えられる要素（広告文・入札・競合・品質スコアなど）を網羅的に列挙してから絞り込む','すぐに広告を止めて作り直す','クライアントに原因を聞く'],ans:1,exp:'ロジカルシンキングの基本はMECE（モレなくダブりなく）。まず原因として考えられる要素を漏れなく列挙し、データを見ながら絞り込んでいきます。感覚で判断せず、構造的に分解することが大切です。'},
+  {id:'c33',unit:'u7',tag:'ロジカルシンキング',q:'「MECE（ミーシー）」の意味として正しいものはどれですか？',choices:['最も重要な指標だけに集中すること','モレなく・ダブりなく情報を整理すること','すべての問題を同時並行で解決すること','データを細かく分析しすぎないこと'],ans:1,exp:'MECE = Mutually Exclusive, Collectively Exhaustive。「互いに重複せず、全体として漏れがない」状態のこと。問題の原因や解決策を整理するときの基本です。'},
+  {id:'c34',unit:'u7',tag:'ロジカルシンキング',q:'「なぜ？」を繰り返して根本原因を探る手法を何と言いますか？',choices:['SDS法','PDCA','なぜなぜ分析（5Why）','SWOT分析'],ans:2,exp:'なぜなぜ分析（5Why）は「なぜ？」を5回繰り返すことで表面的な問題の奥にある根本原因を見つける手法。アナグラムが重視する「ひたすらなぜ？を考える」姿勢そのものです。'},
+  {id:'c35',unit:'u7',tag:'ロジカルシンキング',q:'「CPAが悪化した→入札金額を上げた」という対応のどこが問題ですか？',choices:['入札金額を上げると広告が停止されるから','原因を特定せずに対策を打っており、問題がLPにある場合は解決しないから','CPAが悪化したときは入札を下げるべきだから','CPAと入札金額は関係ないから'],ans:1,exp:'CPA悪化の原因がLPにあるなら、入札金額を上げても解決しません。まず「CTRとCVRのどちらが下がったか」で原因を特定してから対策を打つのがロジカルな手順です。'},
+  {id:'c36',unit:'u7',tag:'ロジカルシンキング',q:'仮説思考において最も重要なことはどれですか？',choices:['必ず正しい答えを出すこと','データがなくても断言すること','「〜ではないか？」という仮説を立てて、データで検証・修正するサイクルを回すこと','仮説は上司に考えてもらうこと'],ans:2,exp:'仮説思考は「まず仮説を立ててから検証する」こと。全データを集めてから考えるのではなく、方向性を仮置きして素早くPDCAを回すことで業務効率が上がります。'},
+  {id:'c37',unit:'u7',tag:'ロジカルシンキング',q:'「CTRが低い」という事実に対し、ロジカルな次の一手はどれですか？',choices:['すぐに広告文を変更する','CTRが低い原因として「広告文の訴求」「入札による表示位置」「競合との差」などを仮説として並べ、データで絞り込む','予算を増やして表示回数を上げる','媒体をGoogle広告からMetaに変更する'],ans:1,exp:'「低い→変える」ではなく「低い→なぜ低いのかを仮説列挙→データで絞り込む→対策」が正しい順序です。原因を特定せずに変更すると何が効いたかわからなくなります。'},
+
+  // u8 言語化力
+  {id:'c38',unit:'u8',tag:'言語化力',q:'「CTRが低い」をクライアントに伝えるとき、最も適切な表現はどれですか？',choices:['CTRが低いです','CTRが業界平均2〜3%に対して0.5%と低く、広告を見た人のクリック率が低い状態です','数字が悪いです','改善が必要です'],ans:1,exp:'具体的な数字と比較基準（業界平均）を使い、何が問題かを明確に伝えることが言語化の基本です。「低い」だけでは相手にとって何も情報になりません。'},
+  {id:'c39',unit:'u8',tag:'言語化力',q:'説明の「わかりやすさ」を高めるために最も効果的な方法はどれですか？',choices:['専門用語を多く使って専門性を見せる','抽象的な概念を具体的な例や数字に落とし込んで説明する','できるだけ長く詳しく説明する','結論を最後に持ってくる'],ans:1,exp:'言語化力の核心は「抽象→具体」への変換。「CTRが低い」よりも「1000人に広告を見せて5人しかクリックしていない状態」のほうがイメージしやすくなります。'},
+  {id:'c40',unit:'u8',tag:'言語化力',q:'「自分の言葉で話す」ことが面接で重要な理由はどれですか？',choices:['暗記したことを正確に再現できると評価されるから','理解が自分の中で消化されており、応用・展開ができることを示せるから','話す速度が遅くなり、聞き取りやすくなるから','面接官に好印象を与えられるから'],ans:1,exp:'「自分の言葉で話す」ことは理解の深さの証明。教科書通りの言葉の再現は暗記でもできますが、自分の例・自社への応用を交えた説明は真の理解がないとできません。'},
+
+  // u9 アナグラムの思考法
+  {id:'c41',unit:'u9',tag:'アナグラムの思考法',q:'アナグラムが最も重視する人物像として最も近いものはどれですか？',choices:['広告の資格を持っている人','ひたすら「なぜ？」を考え続けられる人','プログラミングができる人','大企業出身の人'],ans:1,exp:'アナグラムは「ひたすらなぜ？を考え続けられる人」を重視します。数字の裏にある原因を追求し続ける姿勢が、広告コンサルタントとして最も重要なスキルです。'},
+  {id:'c42',unit:'u9',tag:'アナグラムの思考法',q:'「顧客のビジネスを深く理解する」とはどういうことですか？最も適切なものを選んでください。',choices:['クライアントの業界の専門家になること','クライアントの商品・顧客・競合・市場を理解した上で広告戦略を提案できること','クライアントと友達になること','クライアントの指示通りに広告を設定すること'],ans:1,exp:'アナグラムが言う「顧客理解」は、広告設定だけでなく「その広告主の商品が誰にどう売れるか」まで考えること。クライアントのビジネスパートナーとして提案できることが求められます。'},
+  {id:'c43',unit:'u9',tag:'アナグラムの思考法',q:'アナグラムの「一気通貫の支援」が意味することはどれですか？',choices:['広告出稿から請求まで一括対応','キーワード設計から広告文・LP改善・レポーティングまで戦略全体を支援','1つの媒体に特化した支援','クライアントの全部署を横断的にサポート'],ans:1,exp:'一気通貫とは、広告の出稿設定だけでなく、戦略立案・クリエイティブ・LP改善・数値分析・レポーティングまで一貫して担うこと。「出して終わり」ではなく成果まで責任を持つスタンスです。'},
+];
+
+// ==================== 記述クイズ ====================
+const QUIZ_TEXT = [
+  {id:'t01',unit:'u1',tag:'運用型広告の基礎',q:'「運用型広告」を、広告の知識がない人に説明するとしたら、どう伝えますか？',model:'テレビや雑誌の広告と違い、誰に・いくらで・どんな内容を届けるかを細かく設定でき、出した後も数字を見ながらリアルタイムで調整できる広告のこと。効果が数字で見えるので、何がうまくいって何がダメかがわかる。',points:['リアルタイムで調整できる','数字で効果測定できる','ターゲティングが細かい']},
+  {id:'t02',unit:'u1',tag:'Google vs Meta',q:'Google広告とMeta広告の「ユーザーの状態」の違いを、具体例を使いながら説明してください。',model:'Google広告は、「コンタクトセンター 費用」と自ら検索している人、つまり能動的に情報を求めている人に届く。Meta広告は、Instagramのタイムラインをなんとなくスクロールしている人に表示される、受動的な状態への広告。だから新商品の認知にはMeta、すでに需要のある商品にはGoogleが向いている。',points:['能動的・受動的の違い','具体例を使っている','使い分けの結論']},
+  {id:'t03',unit:'u2',tag:'Google広告の仕組み',q:'「品質スコア」が広告運用に重要な理由を説明してください。',model:'品質スコアが高いと、入札金額が低くても上位に表示されやすくなる。つまり「ユーザーに役立つ広告を作るほど、少ないコストで成果が出る」設計になっている。広告文とLPの内容がキーワードに合っているかが重要で、単にお金をかければ勝てるわけではない。',points:['低コストで上位表示','広告文・LPとの一致','お金だけでは勝てない']},
+  {id:'t04',unit:'u4',tag:'キーワード設計',q:'同じ商品でも「購買フェーズが違えば届けるべき情報が変わる」理由を説明してください。',model:'「とは」で検索している人はまだ商品を知ろうとしている段階なので、いきなり「今すぐ申し込み」を見せても意味がない。「費用 安い」で検索している人はすでに比較・検討中なので、料金や他社との違いを見せる必要がある。検索意図に合った情報を届けないとクリックされても離脱される。',points:['フェーズによって欲しい情報が違う','ミスマッチは離脱につながる','具体例で説明している']},
+  {id:'t05',unit:'u5',tag:'問題切り分け',q:'「CPAが悪化した」と報告を受けたとき、コンサルタントとして最初にすべき思考プロセスを説明してください。',model:'まずCPAが悪化した原因をCTRとCVRで切り分ける。CTRが下がっていれば広告側（広告文・バナー・入札）の問題、CVRが下がっていればLP・サイト側の問題と特定できる。原因を特定してから改善策を提案する順序が重要で、感覚ではなくデータで判断する。',points:['CTRとCVRで切り分ける','原因特定→改善の順序','データで判断する姿勢']},
+  {id:'t06',unit:'u6',tag:'SDS法',q:'SDS法を使って「CTRが低いので広告文を改善したい」という提案文を書いてください（3〜5文）。',model:'【結論】広告文の改善をご提案いたします。【根拠】現在CTRが0.5%と業界平均（2〜3%）を大きく下回っており、広告を見たユーザーのクリック率が低い状態です。一方でCVRは10%と高く、LPに課題はないと判断しています。【結論を繰り返す】よって広告文の訴求内容を見直すことで、費用対効果の大幅な改善が見込めます。',points:['結論が最初','数字による根拠','CVRとの比較でLPを除外','結論で締める']},
+  {id:'t07',unit:'u7',tag:'ロジカルシンキング',q:'「CTRが低い」という問題に対して、考えられる原因を3つ以上挙げてください。（なぜなぜ分析の練習）',model:'①広告文の訴求がキーワードと合っていない（例：「費用 安い」で検索した人に機能紹介の文を出している）②入札金額が低く広告の表示位置が低い（ユーザーの目に入りにくい）③競合の広告文の方が魅力的で差別化できていない④品質スコアが低く表示頻度が下がっている⑤ターゲットのキーワード自体が広告に合っていない',points:['3つ以上の原因','広告文・入札・競合・品質スコアなどの軸','具体的な説明']},
+  {id:'t08',unit:'u7',tag:'ロジカルシンキング',q:'「なぜなぜ分析」を使って「問い合わせ件数が減った」原因を深掘りしてください。（なぜ？を3回以上繰り返す）',model:'問い合わせが減った→なぜ？CVが取れていないから→なぜ？CVRが下がっているから→なぜ？LPの内容が検索意図と合っていないから→なぜ？キーワードを変更したのにLPを更新していなかったから。根本原因：キーワード変更時にLP内容の見直しも同時に行うプロセスがなかった。',points:['なぜ？を3回以上','根本原因まで到達','実務につながる原因']},
+  {id:'t09',unit:'u8',tag:'言語化力',q:'「今日学んだことを友人に話す」としたら、運用型広告についてどう説明しますか？自分の言葉でまとめてください。',model:'（例）「ネット広告って、テレビCMと違って、出した後もリアルタイムで『誰に・いくらで・どんな内容を』調整できるんだよ。しかも、何人に見せて・何人がクリックして・何人が問い合わせたか数字で全部わかる。だから、うまくいってない部分をすぐ直せる。テレビCMみたいに放映後は変えられない、みたいなことがない」',points:['自分の言葉を使っている','身近な例（テレビCM等）と比較','数字・PDCAの概念が入っている']},
+  {id:'t10',unit:'u8',tag:'言語化力',q:'「アナグラムという会社に入りたい理由」を、面接官に伝えるとしたら何と言いますか？学習内容を踏まえて書いてください。',model:'（例）数字に基づいてロジカルに問題を解決する仕事に魅力を感じているからです。運用型広告は「なぜCTRが低いのか」「CVRを上げるにはどうすればいいか」とデータを見ながら常に仮説・検証を繰り返す仕事で、私が大切にしている「なぜ？を深掘りする姿勢」と一致していると感じています。',points:['数字・ロジカルへの言及','なぜ？の姿勢','自分のエピソードor価値観との接続']},
+  {id:'t11',unit:'u9',tag:'アナグラムの思考法',q:'「人を責めるな、仕組みを責めろ」という考え方を、広告運用の文脈で説明してください。',model:'広告の成果が悪いとき「担当者のスキルが足りない」で終わらせるのではなく、「どのプロセスに問題があったか」を仕組みとして捉えること。例えばCPAが悪化したとき、担当者を責めるのではなく「原因特定→改善のフローが整備されていたか」「ABテストの仕組みがあったか」を見直す。個人ではなくプロセスを改善する姿勢。',points:['個人ではなくプロセスを見る','具体例（広告運用での適用）','仕組み改善の姿勢']},
+  {id:'t12',unit:'u9',tag:'アナグラムの思考法',q:'「具体と抽象を行き来する」思考法とはどういうことか、広告運用の例を使って説明してください。',model:'抽象：「CTRが低い＝広告の訴求が刺さっていない」という原則。具体：「『コンタクトセンター 費用』で検索した人に、料金ではなく機能紹介の広告文を出していた」という事実。この2つを行き来することで、「費用訴求に変えれば改善できる」という具体的な改善策が生まれる。抽象だけでは行動できない、具体だけでは応用できない。',points:['抽象と具体の定義','広告での具体例','行き来することの意義']},
+];
+
+// ==================== ケーススタディ ====================
+const QUIZ_CASE = [
+  {id:'k01',unit:'u5',tag:'ケース：指標分析',
+    q:'以下のデータを見て、問題を特定し、改善提案をしてください。',
+    context:'先月のデータ\n表示回数：50,000回\nクリック数：250回（CTR 0.5%）\nCV数：25件（CVR 10%）\nCPA：20,000円\n\n業界平均：CTR 2〜3%、CVR 3〜5%',
+    model:'問題の特定：CTRが0.5%と業界平均（2〜3%）を大きく下回っている。一方CVRは10%と高い。\n\n切り分け：LP・サイトはCVに機能している（CVRが高い）。広告クリエイティブ（広告文・バナー）に問題がある（CTRが低い）。\n\n改善提案：広告文の訴求内容を見直す。キーワードと広告文の一致度を確認し、ABテストを実施する。CTRが業界平均まで改善すれば、同じ予算でもクリック数・CV数が4〜6倍になりCPAも大幅に改善できる。',
+    points:['CTR・CVRで切り分け','問題箇所の特定','具体的な改善策','改善後の効果も言及']},
+  {id:'k02',unit:'u4',tag:'ケース：キーワード戦略',
+    q:'コンタクトセンター事業の会社で、月予算50万円の広告運用を任されました。以下の3つのキーワードのうち、どれに最も予算を集中しますか？理由も答えてください。',
+    context:'A：「コンタクトセンター とは」（月間検索数 5,000回）\nB：「コンタクトセンター 費用 比較」（月間検索数 500回）\nC：「コンタクトセンター おすすめ」（月間検索数 1,500回）',
+    model:'Bに最も予算を集中する。\n\n理由：「費用 比較」は購買フェーズが最も高い（今すぐ検討段階）。検索数は少ないがCVにつながりやすく、費用対効果が高い。\n\nAの「とは」は情報収集初期で購買意欲が低く、CVになりにくい。Cの「おすすめ」は比較検討中だが、BよりCVまでのハードルが高い。\n\n優先順位：B＞C＞A。予算が余ればCにも配分する。',
+    points:['Bを選ぶ','購買フェーズで判断','各キーワードの意図を説明','優先順位の提示']},
+  {id:'k03',unit:'u6',tag:'ケース：提案書作成',
+    q:'以下のデータを元に、SDS法を使ってクライアントへの報告メッセージを書いてください（3〜6文）。',
+    context:'今月のデータ\n・CTR：先月2% → 今月1%（半減）\n・CVR：5%（変化なし）\n・広告費：100,000円（変化なし）\n・CV数：先月20件 → 今月10件（半減）',
+    model:'【結論】広告文の改善をご提案いたします。\n【根拠】先月と比べCTRが2%→1%と半減しており、クリック数・CV数がともに半減した状態です。CVRは5%で変化がないため、LP側に問題はなくクリエイティブ（広告文）に要因があると判断しています。\n【まとめ】ABテストを実施し、効果測定の上、広告文を改善することで先月の成果水準への回復を目指します。',
+    points:['結論が最初','数字による根拠','CVRでLPを除外した切り分け','次のアクションまで提示']},
+  {id:'k04',unit:'u7',tag:'ケース：ロジカル思考',
+    q:'新しいキャンペーンを始めて2週間。「成果が出ていない」とクライアントから連絡が来ました。あなたならどのような順序で問題を調査しますか？',
+    context:'・キャンペーン開始から2週間\n・目標CPA：10,000円\n・現在のCPA：30,000円（目標の3倍）\n・他の情報はまだ未確認',
+    model:'①まずCTRとCVRを確認して問題箇所を切り分ける。\n②CTRが低い（業界平均以下）→広告文・入札・品質スコアを調査。\n③CVRが低い→LP・サイトの内容・表示速度・フォームを調査。\n④どちらも低い→両方に問題あり、優先度の高い方から着手。\n⑤2週間のデータは学習期間中の可能性もあるので、データの信頼性（CV数が統計的に十分か）も確認する。\n\n大切なのは「感覚で動かず、データで原因を特定してから対策を打つ」こと。',
+    points:['CTR・CVRで切り分け','段階的な調査手順','学習期間への言及','感覚ではなくデータ重視']},
+  {id:'k05',unit:'u8',tag:'ケース：言語化',
+    q:'面接官に「運用型広告のコンサルタントとして大切なことは何だと思いますか？」と聞かれました。学習内容を踏まえて答えてください。',
+    context:'（面接の場面です。学習で得た知識を自分の言葉で話してください）',
+    model:'「数字を見て仮説を立て、なぜ？を繰り返す姿勢だと思います。例えばCPAが悪化したときも、すぐに広告を変えるのではなく、CTRとCVRのどちらが原因かを切り分けてから改善策を打つ。その繰り返しが成果につながると学びました。また、数字の分析だけでなく、その結果をクライアントが理解・判断できるよう、SDS法で結論から伝える言語化力も同じくらい重要だと思っています。」',
+    points:['なぜ？の姿勢','データで切り分ける具体例','言語化・SDS法への言及','面接の言葉として自然']},
+];
+
+// ==================== STATE ====================
+let answers = {};
+try { answers = JSON.parse(localStorage.getItem('anagram_v2') || '{}'); } catch(e){}
+let quizMode = 'all';
+let unitFilter = 'all';
+let currentQuiz = null;
+let feedbackShown = false;
+
+function save() { try { localStorage.setItem('anagram_v2', JSON.stringify(answers)); } catch(e){} }
+
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('ja-JP');
+
+// ==================== TAB ====================
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', ['progress','quiz','weak'][i]===t));
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-'+t).classList.add('active');
+  if(t==='progress') renderProgress();
+  if(t==='quiz') renderQuiz();
+  if(t==='weak') renderWeak();
+}
+
+// ==================== PROGRESS ====================
+function renderProgress() {
+  const all = [...QUIZ_CHOICE,...QUIZ_TEXT,...QUIZ_CASE];
+  const total = all.length;
+  const answered = all.filter(q=>answers[q.id]).length;
+  const correct = all.filter(q=>answers[q.id]?.correct).length;
+  const pct = Math.round(correct/total*100);
+
+  const c=2*Math.PI*40; // r=40
+  document.getElementById('ring-fill').style.strokeDashoffset = c*(1-pct/100);
+  document.getElementById('ring-pct').textContent = pct+'%';
+  document.getElementById('stat-total').textContent = total+'問';
+  document.getElementById('stat-correct').textContent = correct+'問';
+  document.getElementById('stat-answered').textContent = answered+'問';
+  document.getElementById('stat-unanswered').textContent = (total-answered)+'問';
+
+  const grid = document.getElementById('unit-grid');
+  grid.innerHTML = UNITS.map(unit=>{
+    const uq = all.filter(q=>q.unit===unit.id);
+    const udone = uq.filter(q=>answers[q.id]?.correct).length;
+    const upct = uq.length ? Math.round(udone/uq.length*100) : 0;
+    const cls = upct===100?'badge-done':upct>0?'badge-partial':'badge-todo';
+    const fillCls = upct===100?'fill-green':upct>0?'fill-yellow':'fill-red';
+    const label = upct===100?'完了':upct>0?'進行中':'未着手';
+    return `<div class="unit-card">
+      <div class="unit-header"><div class="unit-name">${unit.name}</div><div class="unit-badge ${cls}">${label} ${upct}%</div></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill ${fillCls}" style="width:${upct}%"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">${udone} / ${uq.length} 問正解</div>
+    </div>`;
+  }).join('');
+
+  const log = document.getElementById('date-log');
+  const byDate = {};
+  Object.entries(answers).forEach(([qid,data])=>{
+    if(!byDate[data.date]) byDate[data.date]=[];
+    const q=all.find(q=>q.id===qid);
+    if(q) byDate[data.date].push({q,data});
+  });
+  const dates = Object.keys(byDate).sort().reverse();
+  if(!dates.length){ log.innerHTML='<div class="empty"><div class="empty-icon">📅</div>まだクイズを解いていません</div>'; return; }
+  log.innerHTML = dates.map(date=>`
+    <div class="date-section">
+      <div class="date-label">${date}</div>
+      ${byDate[date].map(({q,data})=>`
+        <div class="log-item">
+          <div class="log-dot" style="background:${data.correct?'var(--green)':'var(--red)'}"></div>
+          <div class="log-text">${q.q.slice(0,28)}…</div>
+          <div class="log-result ${data.correct?'result-ok':'result-ng'}">${data.correct?'○':'×'}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// ==================== QUIZ ====================
+function setMode(m) {
+  quizMode = m;
+  ['all','choice','text','case'].forEach(id=>{
+    document.getElementById('btn-'+id)?.classList.toggle('active',id===m);
+  });
+  renderFilterRow();
+  renderQuiz();
+}
+
+function renderFilterRow() {
+  const row = document.getElementById('filter-row');
+  row.innerHTML = `<button class="filter-btn ${unitFilter==='all'?'active':''}" onclick="setFilter('all')">すべて</button>`
+    + UNITS.map(u=>`<button class="filter-btn ${unitFilter===u.id?'active':''}" onclick="setFilter('${u.id}')">${u.name}</button>`).join('');
+}
+
+function setFilter(f) {
+  unitFilter = f;
+  renderFilterRow();
+  renderQuiz();
+}
+
+function getPool() {
+  let pool = [];
+  if(quizMode==='all'||quizMode==='choice') pool = [...pool,...QUIZ_CHOICE];
+  if(quizMode==='all'||quizMode==='text') pool = [...pool,...QUIZ_TEXT];
+  if(quizMode==='all'||quizMode==='case') pool = [...pool,...QUIZ_CASE];
+  if(unitFilter!=='all') pool = pool.filter(q=>q.unit===unitFilter);
+  return pool;
+}
+
+function pickQuiz(pool) {
+  const unanswered = pool.filter(q=>!answers[q.id]);
+  const wrong = pool.filter(q=>answers[q.id]&&!answers[q.id].correct);
+  const candidates = unanswered.length?unanswered:wrong.length?wrong:pool;
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+
+function renderQuiz() {
+  renderFilterRow();
+  const pool = getPool();
+  if(!pool.length){ document.getElementById('quiz-area').innerHTML='<div class="empty"><div class="empty-icon">🔍</div>このフィルターに問題がありません</div>'; return; }
+  const q = pickQuiz(pool);
+  currentQuiz = q;
+  feedbackShown = false;
+
+  const isChoice = QUIZ_CHOICE.find(c=>c.id===q.id);
+  const isCase = QUIZ_CASE.find(c=>c.id===q.id);
+  const typeLabel = isChoice?'4択':'ケース';
+  const typeCls = isChoice?'type-choice':isCase?'type-case':'type-text';
+  const typeText = isChoice?'4択':'isCase'?'ケース':'記述';
+
+  let html = `<div class="quiz-card">
+    <div class="quiz-meta">
+      <div class="quiz-tag">${q.tag}</div>
+      <div class="quiz-type-tag ${typeCls}">${isChoice?'4択':isCase?'ケース':'記述'}</div>
+    </div>
+    <div class="quiz-q">${q.q}</div>`;
+
+  if(q.context) html += `<div class="quiz-context">${q.context.replace(/\n/g,'<br>')}</div>`;
+
+  if(isChoice) {
+    html += `<div class="choices">${q.choices.map((c,i)=>`<button class="choice-btn" onclick="answerChoice(${i})">${i+1}. ${c}</button>`).join('')}</div>`;
+  } else {
+    html += `<textarea class="text-input-area" id="text-ans" placeholder="自分の言葉で答えてみましょう…"></textarea>
+      <button class="action-btn" onclick="answerText()">答え合わせ</button>`;
+  }
+  html += `<div class="feedback-box" id="fb"></div></div>
+    <button class="action-btn secondary" onclick="renderQuiz()" style="margin-top:0">別の問題へ →</button>`;
+  document.getElementById('quiz-area').innerHTML = html;
+}
+
+function answerChoice(i) {
+  if(feedbackShown) return;
+  feedbackShown = true;
+  const q = currentQuiz;
+  const correct = i===q.ans;
+  const today = new Date().toLocaleDateString('ja-JP');
+  answers[q.id] = {correct, attempts:(answers[q.id]?.attempts||0)+1, date:today};
+  save();
+  document.querySelectorAll('.choice-btn').forEach((btn,idx)=>{
+    btn.disabled=true;
+    if(idx===q.ans) btn.classList.add('correct');
+    else if(idx===i&&!correct) btn.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.className='feedback-box show '+(correct?'feedback-correct':'feedback-wrong');
+  fb.innerHTML=`<div class="feedback-label">${correct?'✅ 正解！':'❌ 不正解'}</div>${q.exp}`;
+}
+
+function answerText() {
+  if(feedbackShown) return;
+  const input = document.getElementById('text-ans')?.value.trim();
+  if(!input){alert('回答を入力してください');return;}
+  feedbackShown = true;
+  const q = currentQuiz;
+  const today = new Date().toLocaleDateString('ja-JP');
+  window._textDate = today;
+  const fb=document.getElementById('fb');
+  fb.className='feedback-box show feedback-wrong';
+  fb.innerHTML=`
+    <div class="feedback-label">📝 模範解答と比較してください</div>
+    <div style="color:var(--muted);font-size:12px;margin-bottom:6px">あなたの回答：</div>
+    <div style="background:#111;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.7">${input}</div>
+    <div style="color:var(--muted);font-size:12px;margin-bottom:6px">模範解答：</div>
+    <div style="background:#111;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.7">${q.model.replace(/\n/g,'<br>')}</div>
+    <div style="margin-bottom:12px"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">チェックポイント：</div>${q.points.map(p=>`<span class="point-item">${p}</span>`).join('')}</div>
+    <div class="mark-row">
+      <button class="action-btn green" onclick="markText(true)">✓ 合ってた</button>
+      <button class="action-btn red-btn" onclick="markText(false)">✗ 違った</button>
+    </div>`;
+}
+
+function markText(correct) {
+  const q=currentQuiz;
+  answers[q.id]={correct,attempts:(answers[q.id]?.attempts||0)+1,date:window._textDate};
+  save();
+  const fb=document.getElementById('fb');
+  const prev=fb.innerHTML.replace(/<div class="mark-row">[\s\S]*<\/div>\s*$/,'');
+  fb.className='feedback-box show '+(correct?'feedback-correct':'feedback-wrong');
+  fb.innerHTML=`<div class="feedback-label">${correct?'✅ 記録しました！よくできました':'❌ 記録しました。復習しましょう'}</div>`+prev.replace(/<div class="feedback-label">.*?<\/div>/,'');
+}
+
+// ==================== WEAK ====================
+function renderWeak() {
+  const all=[...QUIZ_CHOICE,...QUIZ_TEXT,...QUIZ_CASE];
+  const weak=all.filter(q=>answers[q.id]&&!answers[q.id].correct);
+  const list=document.getElementById('weak-list');
+  if(!weak.length){
+    list.innerHTML='<div class="empty"><div class="empty-icon">🎉</div>苦手な問題はありません！<br>どんどんクイズを解きましょう</div>';
+    return;
+  }
+  list.innerHTML=`<div style="font-size:13px;color:var(--muted);margin-bottom:16px">${weak.length}問の苦手問題があります</div>`
+    +weak.map(q=>`
+    <div class="weak-item">
+      <div class="weak-item-tag">${UNITS.find(u=>u.id===q.unit)?.name} / ${q.tag}</div>
+      <div class="weak-item-q">${q.q}</div>
+      <div class="retry-btn" onclick="retryWeak('${q.id}')">もう一度解く →</div>
+    </div>`).join('');
+}
+
+function retryWeak(qid) {
+  const all=[...QUIZ_CHOICE,...QUIZ_TEXT,...QUIZ_CASE];
+  const q=all.find(q=>q.id===qid);
+  if(!q)return;
+  currentQuiz=q;
+  feedbackShown=false;
+  switchTab('quiz');
+  const isChoice=QUIZ_CHOICE.find(c=>c.id===qid);
+  const isCase=QUIZ_CASE.find(c=>c.id===qid);
+  const typeCls=isChoice?'type-choice':isCase?'type-case':'type-text';
+  let html=`<div class="quiz-card">
+    <div class="quiz-meta"><div class="quiz-tag">${q.tag}</div><div class="quiz-type-tag ${typeCls}">${isChoice?'4択':isCase?'ケース':'記述'}</div></div>
+    <div class="quiz-q">${q.q}</div>`;
+  if(q.context) html+=`<div class="quiz-context">${q.context.replace(/\n/g,'<br>')}</div>`;
+  if(isChoice){
+    html+=`<div class="choices">${q.choices.map((c,i)=>`<button class="choice-btn" onclick="answerChoice(${i})">${i+1}. ${c}</button>`).join('')}</div>`;
+  } else {
+    html+=`<textarea class="text-input-area" id="text-ans" placeholder="自分の言葉で答えてみましょう…"></textarea>
+      <button class="action-btn" onclick="answerText()">答え合わせ</button>`;
+  }
+  html+=`<div class="feedback-box" id="fb"></div></div>
+    <button class="action-btn secondary" onclick="renderQuiz()" style="margin-top:0">別の問題へ →</button>`;
+  document.getElementById('quiz-area').innerHTML=html;
+}
+
+// init
+renderProgress();
+renderFilterRow();
+renderQuiz();
+</script>
+</body>
+</html>
