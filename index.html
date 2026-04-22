@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>アナグラム面接対策</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --card: #1e1e24;
+    --border: #2a2a35;
+    --accent: #ff6b35;
+    --accent2: #ffb347;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #facc15;
+    --text: #f0f0f5;
+    --muted: #8888aa;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-sub { font-size: 11px; color: var(--muted); }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    gap: 4px;
+  }
+  .tab {
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ===== PAGES ===== */
+  .page { display: none; padding: 20px 16px 80px; }
+  .page.active { display: block; }
+
+  /* ===== PROGRESS PAGE ===== */
+  .overall-card {
+    background: linear-gradient(135deg, #1e1e24, #252530);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .big-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .big-label { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
+
+  .ring-container { position: relative; width: 120px; height: 120px; margin: 0 auto 12px; }
+  .ring-svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+  .ring-fill { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+  .ring-text {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent);
+  }
+
+  .section-title {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  .unit-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .unit-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .unit-card:hover { border-color: var(--accent); }
+  .unit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .unit-name { font-size: 14px; font-weight: 700; }
+  .unit-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .badge-done { background: #1a3a2a; color: var(--green); }
+  .badge-partial { background: #3a2a00; color: var(--yellow); }
+  .badge-todo { background: #2a1a1a; color: var(--red); }
+
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+  .fill-green { background: var(--green); }
+  .fill-yellow { background: var(--yellow); }
+  .fill-red { background: var(--red); }
+
+  /* ===== QUIZ PAGE ===== */
+  .quiz-selector { display: flex; gap: 8px; margin-bottom: 20px; }
+  .mode-btn {
+    flex: 1; padding: 10px; font-size: 13px; font-weight: 700;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 8px; cursor: pointer; transition: all .2s;
+  }
+  .mode-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .quiz-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .quiz-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    background: #1a1a30; color: var(--accent2);
+    padding: 3px 10px; border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .quiz-q { font-size: 16px; font-weight: 700; line-height: 1.6; margin-bottom: 20px; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    text-align: left; padding: 14px 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); border-radius: 10px; cursor: pointer;
+    font-size: 14px; font-family: 'Noto Sans JP', sans-serif;
+    transition: all .15s; line-height: 1.5;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: #1e1e30; }
+  .choice-btn.correct { background: #1a3a2a; border-color: var(--green); color: var(--green); }
+  .choice-btn.wrong { background: #3a1a1a; border-color: var(--red); color: var(--red); }
+  .choice-btn:disabled { cursor: default; }
+
+  .text-input-area {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    padding: 14px;
+    resize: none;
+    min-height: 100px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .text-input-area:focus { border-color: var(--accent); }
+
+  .feedback-box {
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    display: none;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-correct { background: #1a3a2a; border: 1px solid var(--green); }
+  .feedback-wrong { background: #3a1a1a; border: 1px solid var(--red); }
+  .feedback-label { font-weight: 700; margin-bottom: 6px; }
+
+  .action-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 15px; font-weight: 700;
+    background: var(--accent); color: white;
+    border: none; border-radius: 10px;
+    cursor: pointer; transition: opacity .2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 8px;
+  }
+  .action-btn:hover { opacity: .9; }
+  .action-btn.secondary {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+  }
+
+  /* ===== WEAK POINTS PAGE ===== */
+  .weak-header-card {
+    background: linear-gradient(135deg, #2a1a1a, #3a2020);
+    border: 1px solid #4a2020;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .weak-icon { font-size: 36px; }
+  .weak-title { font-size: 16px; font-weight: 700; }
+  .weak-desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .weak-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .weak-item-tag { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .weak-item-q { font-size: 14px; font-weight: 700; margin-bottom: 8px; line-height: 1.5; }
+  .weak-item-rate {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; color: var(--red);
+  }
+  .retry-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 16px;
+    font-size: 12px; font-weight: 700;
+    background: #2a1a1a; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 20px;
+    cursor: pointer; transition: all .2s;
+  }
+  .retry-btn:hover { background: var(--accent); color: white; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty {
+    text-align: center; padding: 60px 20px;
+    color: var(--muted); font-size: 14px;
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* ===== DATE LIST ===== */
+  .date-section { margin-bottom: 24px; }
+  .date-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    letter-spacing: 2px; text-transform: uppercase;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .log-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid #1e1e24;
+  }
+  .log-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .log-text { font-size: 13px; flex: 1; }
+  .log-result { font-family: 'Space Mono', monospace; font-size: 12px; }
+  .result-ok { color: var(--green); }
+  .result-ng { color: var(--red); }
+
+  .btn-row { display: flex; gap: 8px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">ANAGRAM STUDY</div>
+    <div class="header-sub">運用型広告 面接対策</div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;" id="today-date"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('progress')">📊 進捗</div>
+  <div class="tab" onclick="switchTab('quiz')">🎯 クイズ</div>
+  <div class="tab" onclick="switchTab('weak')">⚠️ 弱点</div>
+</div>
+
+<!-- ===== 進捗ページ ===== -->
+<div class="page active" id="page-progress">
+  <div class="overall-card">
+    <div class="ring-container">
+      <svg class="ring-svg" width="120" height="120" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="50"/>
+        <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="50"
+          stroke-dasharray="314" stroke-dashoffset="314"/>
+      </svg>
+      <div class="ring-text" id="ring-pct">0%</div>
+    </div>
+    <div class="big-label">OVERALL PROGRESS</div>
+  </div>
+
+  <div class="section-title">トピック別進捗</div>
+  <div class="unit-grid" id="unit-grid"></div>
+
+  <div class="section-title">日付別ログ</div>
+  <div id="date-log"></div>
+</div>
+
+<!-- ===== クイズページ ===== -->
+<div class="page" id="page-quiz">
+  <div class="quiz-selector">
+    <button class="mode-btn active" onclick="setMode('choice')" id="btn-choice">4択クイズ</button>
+    <button class="mode-btn" onclick="setMode('text')" id="btn-text">記述クイズ</button>
+  </div>
+  <div id="quiz-area"></div>
+</div>
+
+<!-- ===== 弱点ページ ===== -->
+<div class="page" id="page-weak">
+  <div class="weak-header-card">
+    <div class="weak-icon">🔍</div>
+    <div>
+      <div class="weak-title">苦手な問題</div>
+      <div class="weak-desc">正答率50%以下の問題をまとめています</div>
+    </div>
+  </div>
+  <div id="weak-list"></div>
+</div>
+
+<script>
+// ========== DATA ==========
+const UNITS = [
+  { id: 'u1', name: '運用型広告の基礎', topics: ['運用型広告とは', 'Google広告の仕組み', 'Meta広告の仕組み', 'Google vs Metaの使い分け'] },
+  { id: 'u2', name: 'キーワード設計', topics: ['キーワードと検索意図', '購買フェーズの分類', '予算配分の考え方'] },
+  { id: 'u3', name: '指標の読み方', topics: ['CTRとは', 'CVRとは', 'CPAとは', 'CTR・CVRの問題切り分け'] },
+  { id: 'u4', name: '提案書の作り方', topics: ['SDS法の構造', '数字の根拠の示し方', 'クライアント視点の伝え方'] },
+];
+
+const QUIZ_CHOICE = [
+  { id:'q1', unit:'u1', tag:'運用型広告の基礎',
+    q: '運用型広告の最大の特徴として最も正しいものはどれですか？',
+    choices: ['テレビCMより安価に出稿できる','ターゲティング・金額・効果測定をリアルタイムで調整できる','一度設定したら自動で最適化される','必ずGoogleとMetaの両方に出稿しなければならない'],
+    ans: 1, exp: '運用型広告は細かなターゲティング設定・入札金額の変更・数値による効果測定が随時できるのが最大の特徴です。' },
+  { id:'q2', unit:'u1', tag:'Google vs Meta',
+    q: 'Google広告とMeta広告、「新商品・新サービスの認知拡大」に向いているのはどちらですか？',
+    choices: ['Google広告（検索広告）','Meta広告（Facebook/Instagram）','どちらも同じ','状況による（どちらも正解）'],
+    ans: 1, exp: 'Meta広告はユーザーが受動的にタイムラインを見ている状態に表示されるため、まだ知られていない商品の認知拡大に向いています。Google検索広告は需要が既にある商品向けです。' },
+  { id:'q3', unit:'u2', tag:'キーワード設計',
+    q: '「コンタクトセンター 費用 安い」というキーワードを検索した人の購買フェーズはどれですか？',
+    choices: ['情報収集中（まだ検討初期）','比較・検討中（どれにするか迷っている）','今すぐ検討（具体的に比較・見積もり段階）','購入後（導入済みで改善を探している）'],
+    ans: 2, exp: '「費用 安い」という具体的なキーワードは、既に導入を検討しており、コスト面で比較・見積もりをしている今すぐ検討フェーズのユーザーを示します。' },
+  { id:'q4', unit:'u3', tag:'指標の読み方',
+    q: 'CTR（クリック率）の計算式として正しいものはどれですか？',
+    choices: ['広告費 ÷ クリック数 × 100','CV数 ÷ クリック数 × 100','クリック数 ÷ 表示回数 × 100','クリック数 ÷ CV数 × 100'],
+    ans: 2, exp: 'CTR = クリック数 ÷ 表示回数 × 100 です。広告を見た人のうち何%がクリックしたかを表します。' },
+  { id:'q5', unit:'u3', tag:'問題切り分け',
+    q: 'CTRは高いがCVRが低い場合、問題はどこにあると考えられますか？',
+    choices: ['広告クリエイティブ（広告文・画像）','LP（ランディングページ）やサイト設計','キーワード選定','入札金額の設定'],
+    ans: 1, exp: 'CTRが高い＝広告は興味を持たれてクリックされている。しかしCVRが低い＝クリック後に離脱している。問題はLP・サイト側にあると切り分けられます。' },
+  { id:'q6', unit:'u3', tag:'指標の読み方',
+    q: 'CPA（顧客獲得単価）10,000円の意味として正しいものはどれですか？',
+    choices: ['1クリックあたりの費用が10,000円','1,000回表示するのに10,000円かかった','1件の問い合わせ・購入を得るのに10,000円かかった','月の広告費合計が10,000円'],
+    ans: 2, exp: 'CPA = 広告費 ÷ CV数。1件のコンバージョン（問い合わせ・購入など）を獲得するのにかかった費用です。' },
+  { id:'q7', unit:'u4', tag:'提案書の作り方',
+    q: 'SDS法で提案書を書くとき、最初に来るべき内容はどれですか？',
+    choices: ['詳細なデータと数字','結論・提案内容','問題の背景説明','改善後の予測値'],
+    ans: 1, exp: 'SDS法はSummary（結論）→ Details（根拠）→ Summary（結論を繰り返す）の順です。ビジネスでは結論を最初に伝えることで、クライアントが素早く判断できます。' },
+  { id:'q8', unit:'u1', tag:'Google広告の仕組み',
+    q: 'Google広告の掲載順位を決める「広告ランク」の計算式として正しいものはどれですか？',
+    choices: ['入札金額 + 品質スコア','入札金額 × 品質スコア','入札金額 ÷ 品質スコア','入札金額 - 品質スコア'],
+    ans: 1, exp: '広告ランク = 入札金額 × 品質スコア。最高入札額の人が1位になるわけではなく、ユーザーへの関連性（品質スコア）も重要です。' },
+];
+
+const QUIZ_TEXT = [
+  { id:'t1', unit:'u1', tag:'運用型広告の基礎',
+    q: 'Google広告とMeta広告の「ユーザーの状態」の違いを説明してください。',
+    model: 'Google広告は「能動的」—ユーザーが自分で検索しており、すでに商品・サービスへの興味や需要がある状態。Meta広告は「受動的」—ユーザーはタイムラインを眺めているだけで、特定のものを探しているわけではない。',
+    points: ['能動的・受動的（または同意語）','検索という行動の意味','タイムラインへの表示'] },
+  { id:'t2', unit:'u2', tag:'キーワード設計',
+    q: 'コンサルタントが「キーワード設計」をするとき、なぜキーワードだけでなく「検索意図」まで考える必要があるのか説明してください。',
+    model: '同じキーワードでも検索した人の購買フェーズが異なるため。例えば「コンタクトセンター 費用」は今すぐ見積もりを取りたい人、「コンタクトセンター とは」はまだ情報収集中の人。フェーズに合った広告文・LP・予算配分にしないと、クリックされても成果につながらない。',
+    points: ['購買フェーズが異なる','LP・広告文との一致が必要','成果（CV）につながらない理由'] },
+  { id:'t3', unit:'u3', tag:'問題切り分け',
+    q: 'CPAが悪化したとき、コンサルタントとしてまず何を確認しますか？その理由も含めて答えてください。',
+    model: 'CTRとCVRをそれぞれ確認する。CTRが低ければ広告クリエイティブ（広告文・バナー）に問題、CVRが低ければLP・サイト設計に問題があると切り分けられる。この2つを分けて見ることで、何を改善すべきかピンポイントで特定できる。',
+    points: ['CTRとCVRを確認','CTR低→クリエイティブ','CVR低→LP','切り分けの目的'] },
+  { id:'t4', unit:'u4', tag:'提案書の作り方',
+    q: 'SDS法で「結論を最初に伝える」のはなぜか、クライアントの立場から説明してください。',
+    model: 'クライアントは広告代理店にお金を払って結果を委ねている。現状と判断材料をいち早く知りたい。改善の「判断」はクライアントがするもので、「手順・実行」は代理店が担う。だから結論（＝判断するための情報）を最初に伝えることが相手への敬意であり、ビジネスの効率化になる。',
+    points: ['判断はクライアント','手順は代理店','時間を無駄にさせない','信頼関係'] },
+];
+
+// ========== STATE ==========
+let answers = JSON.parse(localStorage.getItem('anagram_answers') || '{}');
+// answers[qid] = {correct: bool, attempts: n, date: str}
+
+let quizMode = 'choice';
+let currentQuiz = null;
+let feedbackShown = false;
+
+// ========== SAVE ==========
+function save() { localStorage.setItem('anagram_answers', JSON.stringify(answers)); }
+
+// ========== INIT ==========
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('ja-JP');
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('active', ['progress','quiz','weak'][i] === t);
+  });
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + t).classList.add('active');
+  if (t === 'progress') renderProgress();
+  if (t === 'quiz') renderQuiz();
+  if (t === 'weak') renderWeak();
+}
+
+// ========== PROGRESS ==========
+function renderProgress() {
+  const allQ = [...QUIZ_CHOICE, ...QUIZ_TEXT];
+  const total = allQ.length;
+  const done = allQ.filter(q => answers[q.id]).length;
+  const pct = Math.round(done / total * 100);
+
+  const circumference = 2 * Math.PI * 50;
+  const offset = circumference * (1 - pct / 100);
+  document.getElementById('ring-fill').style.strokeDashoffset = offset;
+  document.getElementById('ring-pct').textContent = pct + '%';
+
+  // Unit grid
+  const grid = document.getElementById('unit-grid');
+  grid.innerHTML = '';
+  UNITS.forEach(unit => {
+    const unitQ = allQ.filter(q => q.unit === unit.id);
+    const unitDone = unitQ.filter(q => answers[q.id]?.correct).length;
+    const unitPct = unitQ.length ? Math.round(unitDone / unitQ.length * 100) : 0;
+    let cls = unitPct === 100 ? 'badge-done' : unitPct > 0 ? 'badge-partial' : 'badge-todo';
+    let fillCls = unitPct === 100 ? 'fill-green' : unitPct > 0 ? 'fill-yellow' : 'fill-red';
+    let label = unitPct === 100 ? '完了' : unitPct > 0 ? '進行中' : '未着手';
+    grid.innerHTML += `
+      <div class="unit-card">
+        <div class="unit-header">
+          <div class="unit-name">${unit.name}</div>
+          <div class="unit-badge ${cls}">${label} ${unitPct}%</div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill ${fillCls}" style="width:${unitPct}%"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">${unitDone} / ${unitQ.length} 問正解</div>
+      </div>`;
+  });
+
+  // Date log
+  const log = document.getElementById('date-log');
+  const byDate = {};
+  Object.entries(answers).forEach(([qid, data]) => {
+    if (!byDate[data.date]) byDate[data.date] = [];
+    const q = allQ.find(q => q.id === qid);
+    if (q) byDate[data.date].push({ q, data });
+  });
+  const dates = Object.keys(byDate).sort().reverse();
+  if (dates.length === 0) {
+    log.innerHTML = '<div class="empty"><div class="empty-icon">📅</div>まだクイズを解いていません</div>';
+    return;
+  }
+  log.innerHTML = dates.map(date => `
+    <div class="date-section">
+      <div class="date-label">${date}</div>
+      ${byDate[date].map(({q, data}) => `
+        <div class="log-item">
+          <div class="log-dot" style="background:${data.correct ? 'var(--green)' : 'var(--red)'}"></div>
+          <div class="log-text">${q.q.slice(0,30)}…</div>
+          <div class="log-result ${data.correct ? 'result-ok' : 'result-ng'}">${data.correct ? '○' : '×'}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// ========== QUIZ ==========
+function setMode(m) {
+  quizMode = m;
+  document.getElementById('btn-choice').classList.toggle('active', m === 'choice');
+  document.getElementById('btn-text').classList.toggle('active', m === 'text');
+  currentQuiz = null;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const area = document.getElementById('quiz-area');
+  const pool = quizMode === 'choice' ? QUIZ_CHOICE : QUIZ_TEXT;
+
+  // Prefer unanswered or wrong
+  const unanswered = pool.filter(q => !answers[q.id]);
+  const wrong = pool.filter(q => answers[q.id] && !answers[q.id].correct);
+  const candidates = unanswered.length ? unanswered : wrong.length ? wrong : pool;
+  const q = candidates[Math.floor(Math.random() * candidates.length)];
+  currentQuiz = q;
+  feedbackShown = false;
+
+  if (quizMode === 'choice') {
+    area.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-tag">${q.tag}</div>
+        <div class="quiz-q">${q.q}</div>
+        <div class="choices">
+          ${q.choices.map((c,i) => `<button class="choice-btn" onclick="answerChoice(${i})">${i+1}. ${c}</button>`).join('')}
+        </div>
+        <div class="feedback-box" id="fb"></div>
+      </div>
+      <button class="action-btn secondary" onclick="renderQuiz()">別の問題へ →</button>`;
+  } else {
+    area.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-tag">${q.tag}</div>
+        <div class="quiz-q">${q.q}</div>
+        <textarea class="text-input-area" id="text-ans" placeholder="自分の言葉で答えてみましょう…"></textarea>
+        <button class="action-btn" onclick="answerText()">答え合わせ</button>
+        <div class="feedback-box" id="fb"></div>
+      </div>
+      <button class="action-btn secondary" id="next-btn" style="display:none;margin-top:8px" onclick="renderQuiz()">次の問題 →</button>`;
+  }
+}
+
+function answerChoice(i) {
+  if (feedbackShown) return;
+  feedbackShown = true;
+  const q = currentQuiz;
+  const correct = i === q.ans;
+  const today = new Date().toLocaleDateString('ja-JP');
+  answers[q.id] = { correct, attempts: (answers[q.id]?.attempts || 0) + 1, date: today };
+  save();
+
+  document.querySelectorAll('.choice-btn').forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === q.ans) btn.classList.add('correct');
+    else if (idx === i && !correct) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('fb');
+  fb.className = 'feedback-box show ' + (correct ? 'feedback-correct' : 'feedback-wrong');
+  fb.innerHTML = `<div class="feedback-label">${correct ? '✅ 正解！' : '❌ 不正解'}</div>${q.exp}`;
+}
+
+function answerText() {
+  if (feedbackShown) return;
+  feedbackShown = true;
+  const q = currentQuiz;
+  const input = document.getElementById('text-ans').value.trim();
+  if (!input) { alert('回答を入力してください'); feedbackShown = false; return; }
+
+  const today = new Date().toLocaleDateString('ja-JP');
+
+  const fb = document.getElementById('fb');
+  fb.className = 'feedback-box show feedback-wrong';
+  fb.innerHTML = `
+    <div class="feedback-label">📝 模範解答と比較してください</div>
+    <div style="margin-bottom:12px;color:var(--muted);font-size:13px">あなたの回答：</div>
+    <div style="background:#111;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.7;color:var(--text)">${input}</div>
+    <div style="margin-bottom:6px;color:var(--muted);font-size:13px">模範解答：</div>
+    <div style="background:#111;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;line-height:1.7;color:var(--text)">${q.model}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">チェックポイント：${q.points.map(p=>`<span style="background:#2a2a3a;padding:2px 8px;border-radius:20px;margin:2px;display:inline-block">${p}</span>`).join('')}</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="action-btn" style="background:var(--green)" onclick="markText(true)">✓ 合ってた</button>
+      <button class="action-btn" style="background:var(--red)" onclick="markText(false)">✗ 違った</button>
+    </div>`;
+
+  document.getElementById('next-btn').style.display = 'block';
+  window._textDate = today;
+}
+
+function markText(correct) {
+  const q = currentQuiz;
+  answers[q.id] = { correct, attempts: (answers[q.id]?.attempts || 0) + 1, date: window._textDate };
+  save();
+  const fb = document.getElementById('fb');
+  fb.className = 'feedback-box show ' + (correct ? 'feedback-correct' : 'feedback-wrong');
+  fb.innerHTML = correct
+    ? '<div class="feedback-label">✅ 記録しました！よくできました</div>'
+    : '<div class="feedback-label">❌ 記録しました。復習しましょう</div>' + fb.innerHTML.replace(/<div style="display:flex.*$/s,'');
+}
+
+// ========== WEAK ==========
+function renderWeak() {
+  const allQ = [...QUIZ_CHOICE, ...QUIZ_TEXT];
+  const weak = allQ.filter(q => answers[q.id] && !answers[q.id].correct);
+  const list = document.getElementById('weak-list');
+
+  if (weak.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div>苦手な問題はありません！<br>クイズをもっと解いてみましょう</div>';
+    return;
+  }
+
+  list.innerHTML = weak.map(q => `
+    <div class="weak-item">
+      <div class="weak-item-tag">${UNITS.find(u=>u.id===q.unit)?.name} / ${q.tag}</div>
+      <div class="weak-item-q">${q.q}</div>
+      <div class="weak-item-rate">× 不正解</div>
+      <div class="retry-btn" onclick="goQuizRetry('${q.id}')">もう一度解く →</div>
+    </div>`).join('');
+}
+
+function goQuizRetry(qid) {
+  const allQ = [...QUIZ_CHOICE, ...QUIZ_TEXT];
+  const q = allQ.find(q => q.id === qid);
+  if (!q) return;
+  quizMode = QUIZ_CHOICE.find(c => c.id === qid) ? 'choice' : 'text';
+  currentQuiz = q;
+  switchTab('quiz');
+  feedbackShown = false;
+
+  // render this specific quiz
+  document.getElementById('btn-choice').classList.toggle('active', quizMode === 'choice');
+  document.getElementById('btn-text').classList.toggle('active', quizMode === 'text');
+
+  const area = document.getElementById('quiz-area');
+  if (quizMode === 'choice') {
+    area.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-tag">${q.tag}</div>
+        <div class="quiz-q">${q.q}</div>
+        <div class="choices">
+          ${q.choices.map((c,i) => `<button class="choice-btn" onclick="answerChoice(${i})">${i+1}. ${c}</button>`).join('')}
+        </div>
+        <div class="feedback-box" id="fb"></div>
+      </div>
+      <button class="action-btn secondary" onclick="renderQuiz()">別の問題へ →</button>`;
+  } else {
+    area.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-tag">${q.tag}</div>
+        <div class="quiz-q">${q.q}</div>
+        <textarea class="text-input-area" id="text-ans" placeholder="自分の言葉で答えてみましょう…"></textarea>
+        <button class="action-btn" onclick="answerText()">答え合わせ</button>
+        <div class="feedback-box" id="fb"></div>
+      </div>
+      <button class="action-btn secondary" id="next-btn" style="display:none;margin-top:8px" onclick="renderQuiz()">次の問題 →</button>`;
+  }
+}
+
+// init
+renderProgress();
+renderQuiz();
+</script>
+</body>
+</html>
